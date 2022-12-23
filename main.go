@@ -12,7 +12,7 @@ func main() {
 	})
 	
 	// ハンドラ:myMiddleware1をパス:/に登録している
-	http.Handle("/", myMiddleware1(helloHandler))
+	http.Handle("/", myMiddleware2(myMiddleware1(helloHandler)))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -26,5 +26,13 @@ func myMiddleware1(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 		
 		io.WriteString(w, "Post-process1\n")
+	})
+}
+
+func myMiddleware2(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "Pre-process2\n")
+		next.ServeHTTP(w, r)
+		io.WriteString(w, "Pre-process2\n")
 	})
 }
